@@ -1,0 +1,66 @@
+---
+title: "EDA for c13"
+authors: "Aidan Schneider, Amir Osorio, Danny Kennen"
+output:
+  github_document:
+    toc: true
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+Import data files
+
+```{r}
+# import child mortality csv
+df_child_mortality <- read_csv("./data_files/child_mortality_0_5_year_olds_dying_per_1000_born.csv")
+
+# " daily income csv
+df_daily_income <- read_csv("./data_files/mincpcap_cppp.csv")
+
+# " life expectancy at birth csv
+df_life_expectancy <- read_csv("./data_files/life_exp.csv")
+
+# " population growth csv
+df_pop_growth <- read_csv("./data_files/population_growth_annual_percent.csv")
+
+# " fertility csv
+df_fertility <- read_csv("./data_files/children_per_woman_total_fertility.csv")
+
+# " c02 emissions csv
+df_co2emissions <- read_csv("./data_files/co2_pcap_cons.csv")
+
+# " population csv
+df_population <- read_csv("./data_files/pop.csv")
+
+```
+
+
+Factors we want to examine for quality of life: 
+
+- child mortality
+- daily income
+- GDP-per-capita
+- life expectancy at birth 
+- population growth
+- fertility
+- c02 emissions
+- population 
+
+Make EDA plots here!:
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
