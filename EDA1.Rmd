@@ -101,7 +101,8 @@ df_daily <- df_daily_income %>%
     cols = -country,
     names_to = "year",
     values_to = "income_perp"
-  ) 
+  ) %>% 
+  filter(as.numeric(year) <= 2025)
 
 countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
 
@@ -111,8 +112,8 @@ df_incomed <- df_daily %>%
 df_incomed
   
 df_incomed %>% 
-  ggplot(aes(x = as.numeric(year), y = income_perp)) +
-  geom_line(color = )
+  ggplot(aes(x = as.numeric(year), y = income_perp, color = country)) +
+  geom_line()
 
 ```
 

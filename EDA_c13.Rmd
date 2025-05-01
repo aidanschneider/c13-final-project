@@ -35,6 +35,8 @@ df_co2emissions <- read_csv("./data_files/co2_pcap_cons.csv")
 # " population csv
 df_population <- read_csv("./data_files/pop.csv")
 
+# " GDP-per-capita csv
+df_gdp_percap <- read_csv("./data_files/gdp_pcap.csv")
 ```
 
 
@@ -80,11 +82,12 @@ df_pop <- df_population %>%
 
 # example population code 
 df_albania <- df_pop %>% 
-  filter(country == "Albania") 
+  filter(country %in% countries) 
 
 df_albania %>% 
-  ggplot(aes(x = as.numeric(year), y = population_numeric)) +
-  geom_line()
+  ggplot(aes(x = as.numeric(year), y = population_numeric, color = country)) +
+  geom_line() +
+  scale_x_log10()
 
 
 ```
@@ -98,23 +101,42 @@ df_daily <- df_daily_income %>%
     cols = -country,
     names_to = "year",
     values_to = "income_perp"
-  ) 
+  ) %>% 
+  filter(as.numeric(year) <= 2000 & as.numeric(year) >= 1985)
 
 countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
 
 df_incomed <- df_daily %>% 
   filter(country %in% countries)
-
-df_incomed
   
 df_incomed %>% 
-  ggplot(aes(x = as.numeric(year), y = income_perp)) +
-  geom_line(color = )
+  ggplot(aes(x = as.numeric(year), y = income_perp, color = country)) +
+  geom_line()
 
 ```
 
 ```{r}
+# use this dataframe for analysis 
 
+df_life_exp <- df_life_expectancy %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "life_exp"
+  ) %>% 
+  filter(as.numeric(year) <= 2025)
+
+countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
+
+df_lifeexp <- df_life_exp %>% 
+  filter(country %in% countries)
+
+df_lifeexp
+  
+df_lifeexp %>% 
+  ggplot(aes(x = as.numeric(year), y = life_exp, color = country)) +
+  geom_line() +
+  geom_smooth(span = 0.3)
 ```
 
 
