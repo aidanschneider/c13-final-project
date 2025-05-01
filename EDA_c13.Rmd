@@ -68,12 +68,12 @@ df_pop <- df_population %>%
       str_detect(population, "B") ~ as.numeric(str_replace(population, "B", "")) * 1e9,
       TRUE ~ as.numeric(population)
     )
-  )
+  ) %>% 
+  # filters out all years after 2025 as they are predictions
+  filter(year <= 2025)
 
 #NOTE: TO ANALYZE A NEW COUNTRY, MAKE A NEW DATAFRAME FILTERING FOR THE COUNTRY
 #YOU ARE TRYING TO ANALYZE 
-
-# NOTE 2: Don't plot after 2025, those are projected population values
 
 # example population code 
 df_albania <- df_pop %>% 
@@ -87,6 +87,9 @@ df_albania %>%
 ```
 
 ```{r}
+
+
+
 
 ```
 
