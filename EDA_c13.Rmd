@@ -54,6 +54,9 @@ Make EDA plots here!:
 ```{r}
 # df_pop graphs for soviet bloc countries 
 
+
+# if you need to filter for only post-communist countries, use the list below:
+# ("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
 df_pop <- df_population %>% 
   pivot_longer(
     cols = -country,
