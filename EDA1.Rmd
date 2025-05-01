@@ -1,5 +1,5 @@
 ---
-title: "EDA for c13"
+title: "EDA for GDP-Per Capita and Population Growth"
 authors: "Aidan Schneider, Amir Osorio, Danny Kennen"
 output:
   github_document:
@@ -57,7 +57,7 @@ Make EDA plots here!:
 
 # if you need to filter for only post-communist countries, use the list below:
 # ("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
-df_pop <- df_population %>% 
+df_pop_g <- df_pop_growth %>% 
   pivot_longer(
     cols = -country,
     names_to = "year",
@@ -79,15 +79,18 @@ df_pop <- df_population %>%
 #YOU ARE TRYING TO ANALYZE 
 
 # example population code 
-df_albania <- df_pop %>% 
-  filter(country == "Albania") 
+df_growth <- df_pop_g %>% 
+  filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Czechia", "Slovakia", "Hungary")) 
 
-df_albania %>% 
+df_growth %>% 
   ggplot(aes(x = as.numeric(year), y = population_numeric)) +
-  geom_line()
-
-
+  geom_line(aes(color = country))+
+  geom_smooth(method = "loess") +
+  labs(title = "Population Growth of Post-Communist Countries",
+       x = "Year",
+       y =  "Population")
 ```
+
 
 ```{r}
 
