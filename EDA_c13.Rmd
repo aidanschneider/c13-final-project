@@ -52,6 +52,37 @@ Factors we want to examine for quality of life:
 Make EDA plots here!:
 
 ```{r}
+# df_pop graphs for soviet bloc countries 
+
+df_pop <- df_population %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "population"
+  ) %>%
+  # converts values such as "400k" and "1.28M" to "400,000" and "1,280,000"
+  mutate(
+    population_numeric = case_when(
+      str_detect(population, "k") ~ as.numeric(str_replace(population, "k", "")) * 1e3,
+      str_detect(population, "M") ~ as.numeric(str_replace(population, "M", "")) * 1e6,
+      str_detect(population, "B") ~ as.numeric(str_replace(population, "B", "")) * 1e9,
+      TRUE ~ as.numeric(population)
+    )
+  )
+
+#NOTE: TO ANALYZE A NEW COUNTRY, MAKE A NEW DATAFRAME FILTERING FOR THE COUNTRY
+#YOU ARE TRYING TO ANALYZE 
+
+# NOTE 2: Don't plot after 2025, those are projected population values
+
+# example population code 
+df_albania <- df_pop %>% 
+  filter(country == "Albania") 
+
+df_albania %>% 
+  ggplot(aes(x = as.numeric(year), y = population_numeric)) +
+  geom_line()
+
 
 ```
 
