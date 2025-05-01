@@ -114,7 +114,26 @@ df_incomed %>%
 ```
 
 ```{r}
+# use this dataframe for analysis 
 
+df_life_exp <- df_life_expectancy %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "life_exp"
+  ) %>% 
+  filter(as.numeric(year) <= 2025)
+
+countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
+
+df_lifeexp <- df_life_exp %>% 
+  filter(country %in% countries)
+
+df_lifeexp
+  
+df_lifeexp %>% 
+  ggplot(aes(x = as.numeric(year), y = life_exp, color = country)) +
+  geom_line()
 ```
 
 
