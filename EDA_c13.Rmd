@@ -87,7 +87,13 @@ df_albania <- df_pop %>%
 df_albania %>% 
   ggplot(aes(x = as.numeric(year), y = population_numeric, color = country)) +
   geom_line() +
-  scale_x_log10()
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5) + 
+  scale_y_log10()
 
 
 ```
