@@ -1,14 +1,13 @@
----
-title: "R Notebook"
-output: html_notebook
+------------------------------------------------------------------------
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+title: "R Notebook" output: html_notebook
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*.
 
 ```{r}
 plot(cars)
-```a---
 title: "EDA for c13"
 authors: "Aidan Schneider, Amir Osorio, Danny Kennen"
 output:
@@ -16,7 +15,6 @@ output:
     toc: true
 ---
 
-```{r}
 library(tidyverse)
 library(dplyr)
 ```
@@ -47,85 +45,25 @@ df_population <- read_csv("./data_files/pop.csv")
 
 ```
 
+The metrics we want to examine for quality of life:
 
-Factors we want to examine for quality of life: 
+-   child mortality
+-   daily income
+-   GDP-per-capita
+-   life expectancy at birth
+-   population growth
+-   fertility
+-   c02 emissions
+-   population
 
-- child mortality
-- daily income
-- GDP-per-capita
-- life expectancy at birth 
-- population growth
-- fertility
-- c02 emissions
-- population 
+In this EDA file, the metrics that will be visualized are
 
-Make EDA plots here!:
-
-```{r}
-# df_pop graphs for soviet bloc countries 
-
-
-# if you need to filter for only post-communist countries, use the list below:
-# ("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
-df_pop <- df_population %>% 
-  pivot_longer(
-    cols = -country,
-    names_to = "year",
-    values_to = "population"
-  ) %>%
-  # converts values such as "400k" and "1.28M" to "400,000" and "1,280,000"
-  mutate(
-    population_numeric = case_when(
-      str_detect(population, "k") ~ as.numeric(str_replace(population, "k", "")) * 1e3,
-      str_detect(population, "M") ~ as.numeric(str_replace(population, "M", "")) * 1e6,
-      str_detect(population, "B") ~ as.numeric(str_replace(population, "B", "")) * 1e9,
-      TRUE ~ as.numeric(population)
-    )
-  ) %>% 
-  # filters out all years after 2025 as they are predictions
-  filter(year <= 2025)
-
-#NOTE: TO ANALYZE A NEW COUNTRY, MAKE A NEW DATAFRAME FILTERING FOR THE COUNTRY
-#YOU ARE TRYING TO ANALYZE 
-
-# example population code 
-df_albania <- df_pop %>% 
-  filter(country == "Albania") 
-
-df_albania %>% 
-  ggplot(aes(x = as.numeric(year), y = population_numeric)) +
-  geom_line()
-
-
-```
+-   Child Mortality
+-   fertility
+-   Co2 emissions
 
 ```{r}
-
-# use this dataframe for analysis 
-
-df_daily <- df_daily_income %>% 
-   pivot_longer(
-    cols = -country,
-    names_to = "year",
-    values_to = "income_perp"
-  ) 
-
-countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
-
-df_incomed <- df_daily %>% 
-  filter(country %in% countries) %>% 
-  filter(year <= 2025)
-
-df_incomed
-  
-df_incomed %>% 
-  ggplot(aes(x = as.numeric(year), y = income_perp)) +
-  geom_line()
-
-```
-
-```{r}
-# child_morality, fatality, co2_emissions 
+# visual representation for child_mortality over time for specified countries
 df_c_mortality <- df_child_mortality %>% 
    pivot_longer(
     cols = -country,
@@ -148,16 +86,15 @@ df_mortality %>%
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(x = year, y = mortality_numbers)) +
   geom_line(aes(color = country))+
-  geom_smooth(method = "loess") 
-
-
-
-
-
+  geom_smooth(method = "loess", color = "black", se = TRUE)
 
 ```
+
+**Observations:**
+- Here we can see a general downward trend in terms of child mortality with the exception of Ukraine in the late 1940's.
+
 ```{r}
-# child_morality, fatality, co2_emissions 
+# Visual representation for fertility  over time for specified countries
 df_fert <- df_fertility %>% 
    pivot_longer(
     cols = -country,
@@ -180,23 +117,25 @@ df_fert_clean %>%
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(x = year, y = fertility_numbers)) +
   geom_line(aes(color = country)) +
-  geom_smooth(se = TRUE, method = "loess") 
+  geom_smooth(method = "loess", color = "black", se = TRUE) 
 
 
 
 
 ```
+**Observations:**
+Here we can also see a general downward trend in fertility.
 ```{r}
-# child_morality, fatality, co2_emissions
+# Visual representation for co2_emissions over time for specified countries
 
 df_co2_emm <- df_co2emissions %>%
   pivot_longer(
     cols = -country,
     names_to = "year",
     values_to = "emm",
-    values_transform = list(emm = as.numeric)  # Ensure all values are numeric
+    values_transform = list(emm = as.numeric)
   ) %>%
-  mutate(year = as.numeric(year))  # Convert year to numeric
+  mutate(year = as.numeric(year))
 
 countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
 
@@ -207,16 +146,18 @@ df_co2_emm_clean <- df_co2_emm %>%
 df_co2_emm_clean %>%
   ggplot(aes(x = year, y = emm))+
   geom_line(aes(color = country))+
-  geom_smooth(method = "loess") 
+  geom_smooth(method = "loess", color = "black", se = TRUE) 
 
 ```
+**Observations:**
+
+Here we can see a general upwards trend in Co2 emissions starting around the 1940's.
 
 
 
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
 
 The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
-
