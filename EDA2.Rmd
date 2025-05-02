@@ -1,7 +1,6 @@
 ---
 title: "R Notebook"
 output: html_notebook
-a---
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
@@ -114,17 +113,101 @@ df_daily <- df_daily_income %>%
 countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
 
 df_incomed <- df_daily %>% 
-  filter(country %in% countries)
+  filter(country %in% countries) %>% 
+  filter(year <= 2025)
 
 df_incomed
   
 df_incomed %>% 
   ggplot(aes(x = as.numeric(year), y = income_perp)) +
-  geom_line(color = )
+  geom_line()
 
 ```
 
 ```{r}
+# child_morality, fatality, co2_emissions 
+df_c_mortality <- df_child_mortality %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "mortality_numbers"
+  ) %>% 
+  mutate(year = as.numeric(year)) 
+
+countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
+
+
+
+df_mortality <- df_c_mortality %>%
+  filter(country %in% countries) %>% 
+  filter(year <= 2025)
+
+df_mortality
+
+df_mortality %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(x = year, y = mortality_numbers)) +
+  geom_line(aes(color = country))+
+  geom_smooth(method = "loess") 
+
+
+
+
+
+
+```
+```{r}
+# child_morality, fatality, co2_emissions 
+df_fert <- df_fertility %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "fertility_numbers"
+  ) %>% 
+  mutate(year = as.numeric(year)) 
+
+countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
+
+
+
+df_fert_clean <- df_fert %>%
+  filter(country %in% countries) %>% 
+  filter(year <= 2025)
+
+df_fert_clean
+
+df_fert_clean %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(x = year, y = fertility_numbers)) +
+  geom_line(aes(color = country)) +
+  geom_smooth(se = TRUE, method = "loess") 
+
+
+
+
+```
+```{r}
+# child_morality, fatality, co2_emissions
+
+df_co2_emm <- df_co2emissions %>%
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "emm",
+    values_transform = list(emm = as.numeric)  # Ensure all values are numeric
+  ) %>%
+  mutate(year = as.numeric(year))  # Convert year to numeric
+
+countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
+
+df_co2_emm_clean <- df_co2_emm %>%
+  filter(country %in% countries) %>%
+  filter(year <= 2025)
+
+df_co2_emm_clean %>%
+  ggplot(aes(x = year, y = emm))+
+  geom_line(aes(color = country))+
+  geom_smooth(method = "loess") 
 
 ```
 
