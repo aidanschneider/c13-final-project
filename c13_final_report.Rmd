@@ -19,6 +19,8 @@ library(dplyr)
 
 ### Import data files
 
+In the following code block we import the data from our data file as dataframes for ease of use in data analysis. 
+
 ```{r}
 # import child mortality csv
 df_child_mortality <- read_csv("./data_files/child_mortality_0_5_year_olds_dying_per_1000_born.csv")
@@ -47,7 +49,7 @@ df_gdp_percap <- read_csv("./data_files/gdp_pcap.csv")
 
 ## Metrics
 
-
+As stated, we use the following metrics to quantify "quality of life":
 
 -   child mortality
 -   daily income
@@ -61,7 +63,8 @@ df_gdp_percap <- read_csv("./data_files/gdp_pcap.csv")
 
 ## EDA
 
-To begin our analysis of the data, we first perform EDA to get a general idea for the shape of the overall data. We decided to look at the full timescale for each of these datasets to determine key inflection points that could be attributed to the transition from communism to capitalism that we are interested in. Our full EDA analysis can be found in 
+To begin our analysis of the data, we first perform EDA to get a general idea for the shape of the overall data. We decided to look at the full timescale for each of these datasets to determine key inflection points that could be attributed to the transition from communism to capitalism that we are interested in. 
+Given that a majority of communist states fragmented into multiple smaller, democratic nations between 1980 and 2005, we decided to only analyze this timeframe. We also noticed from our EDA that there were inflection points in some of the metrics we would use to quantify quality of life. This is demonstrated in the following graphs, which are isolated to this 1980-2005 timeframe.
 
 ### Population Growth
 
@@ -81,7 +84,7 @@ df_pop_g <- df_pop_growth %>%
       TRUE ~ as.numeric(population)
     )
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) >= 1980)
 
 df_growth <- df_pop_g %>% 
   filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Czechia", "Slovakia", "Hungary")) 
@@ -99,7 +102,7 @@ df_growth %>%
 
 ```
 
-In this plot, our data had a lot of gaps and began in 1960. Despit this we were able to determine a key inflection point around 1980-2005 where population growth stagnates. 
+
 
 
 ### GDP-Per-Capita
@@ -116,7 +119,7 @@ df_gdp <- df_gdp_percap %>%
 
 df_gdp_comm <- df_gdp %>% 
   filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")) %>%
-  filter (year <= 2025)
+  filter (year <= 2005 & year >= 1980)
   
 df_gdp_comm %>% 
   ggplot(aes(x = year, y = gdp)) +
@@ -146,7 +149,7 @@ df_c_mortality <- df_child_mortality %>%
 
 df_mortality <- df_c_mortality %>%
   filter(country %in% countries) %>% 
-  filter(year <= 2025)
+  filter(year <= 2005 & year >= 1980)
 
 df_mortality %>%
   mutate(year = as.numeric(year)) %>%
@@ -174,7 +177,7 @@ df_fert <- df_fertility %>%
 
 df_fert_clean <- df_fert %>%
   filter(country %in% countries) %>% 
-  filter(year <= 2025)
+  filter(year <= 2005 & year >= 1980)
 
 df_fert_clean %>%
   mutate(year = as.numeric(year)) %>%
@@ -202,7 +205,7 @@ df_co2_emm <- df_co2emissions %>%
   mutate(year = as.numeric(year))  # Convert year to numeric
 df_co2_emm_clean <- df_co2_emm %>%
   filter(country %in% countries) %>%
-  filter(year <= 2025)
+  filter(year <= 2005 & year >= 1980)
 
 df_co2_emm_clean %>%
   ggplot(aes(x = year, y = emm))+
@@ -231,8 +234,7 @@ df_pop <- df_population %>%
       TRUE ~ as.numeric(population)
     )
   ) %>% 
-  
-  filter(year <= 2025)
+  filter(year <= 2005 & year >= 1980)
 
 df_albania <- df_pop %>% 
   filter(country %in% countries) 
@@ -257,7 +259,7 @@ df_daily <- df_daily_income %>%
     names_to = "year",
     values_to = "income_perp"
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) >= 1980)
 df_incomed <- df_daily %>% 
   filter(country %in% countries)
   
@@ -282,7 +284,7 @@ df_life_exp <- df_life_expectancy %>%
     names_to = "year",
     values_to = "life_exp"
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) >= 1980)
 df_lifeexp <- df_life_exp %>% 
   filter(country %in% countries)
 df_lifeexp %>% 
