@@ -45,7 +45,7 @@ df_population <- read_csv("./data_files/pop.csv")
 
 ```
 
-Factors we want to examine for quality of life:
+The metrics we want to examine for quality of life:
 
 -   child mortality
 -   daily income
@@ -56,7 +56,7 @@ Factors we want to examine for quality of life:
 -   c02 emissions
 -   population
 
-In this EDA file, the factors that will be visualized are
+In this EDA file, the metrics that will be visualized are
 
 -   Child Mortality
 -   fertility
