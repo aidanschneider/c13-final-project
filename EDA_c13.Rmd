@@ -157,3 +157,20 @@ df_lifeexp %>%
 ```
 
 
+```{r}
+population_se <- df_pop %>%
+  filter(country %in% countries) %>%
+  group_by(year) %>%
+  summarize(
+    mean_population = mean(population_numeric, na.rm = TRUE),
+    std_dev = sd(population_numeric, na.rm = TRUE),
+    n_countries = n(),
+    standard_error = std_dev / sqrt(n_countries)
+  )
+
+# View the results
+population_se
+
+```
+
+
