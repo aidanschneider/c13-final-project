@@ -15,10 +15,9 @@ library(dplyr)
 
 # Background and Data
 
-As the USSR, Yugoslavia, and other communist countries behind the Iron Curtain began to decline between the 80’s and 90’s due to a host of economic and social factors, democracies took their place. Although the transition from communism to capitalism is seen as a net benefit for these countries at a high-level, its effect on their population’s quality of life is not as easy to quantify. 
-To quantify the quality of life of a nation’s people, we chose the following factors: child mortality, daily income per person, GDP-per-capita, life expectancy, population growth, fertility, CO2 emissions, and population. We also chose these factors as their data was more complete on Gapminder.
+As the USSR, Yugoslavia, and other communist countries behind the Iron Curtain began to decline between the 80’s and 90’s due to a host of economic and social factors, democracies took their place. Although the transition from communism to capitalism is seen as a net benefit for these countries at a high-level, its effect on their population’s quality of life is not as easy to quantify. To quantify the quality of life of a nation’s people, we chose the following factors: child mortality, daily income per person, GDP-per-capita, life expectancy, population growth, fertility, CO2 emissions, and population. We also chose these factors as their data was more complete on Gapminder.
 
-# Analysis of Data 
+# Analysis of Data
 
 To answer our question we chose to source our data from Gapminder, an independent Swedish foundation that works to dispel common myths around poverty and inequality in developing nations. To note, some major donors of Gapminder include the Bill and Melinda Gates Foundation and the Ikea Foundation, which may or may not introduce some bias into the data they provide.
 
@@ -52,7 +51,7 @@ df_gdp_percap <- read_csv("./data_files/gdp_pcap.csv")
 
 ## Metrics
 
-As noted above, we use the following metrics to quantify quality of life: 
+As noted above, we use the following metrics to quantify quality of life:
 
 -   child mortality
 -   daily income
@@ -63,12 +62,13 @@ As noted above, we use the following metrics to quantify quality of life:
 -   c02 emissions
 -   population
 
-
 ## EDA
 
-To begin our analysis of the data, we first perform EDA to get a general idea for the shape of the overall data. We decided to look at the full timescale for each of these datasets to determine key inflection points that could be attributed to the transition from communism to capitalism that we are interested in. Our full EDA analysis can be found in the "EDA_c13", "EDA1", and "EDA2" files. In this EDA process we decided to analyze the timeframe from 1980-2005 as that is when most countries that were communist transitioned to capitalism with the fall of the Soviet Union and Yugoslavia. 
+To begin our analysis of the data, we first perform EDA to get a general idea for the shape of the overall data. We decided to look at the full timescale for each of these datasets to determine key inflection points that could be attributed to the transition from communism to capitalism that we are interested in. Our full EDA analysis can be found in the "EDA_c13", "EDA1", and "EDA2" files. In this EDA process we decided to analyze the timeframe from 1980-2005 as that is when most countries that were communist transitioned to capitalism with the fall of the Soviet Union and Yugoslavia.
 
 ### Population Growth
+
+In this graph for Population Growth post-communism, we can see a generally steady line that dips slightly downwards in the overall trend.
 
 ```{r}
 
@@ -104,10 +104,9 @@ df_growth %>%
 
 ```
 
-
-
-
 ### GDP-Per-Capita
+
+In this graph for GDP-per-capita post communism, we can see this dip in the late 1990’s continued by an increase in the 2000’s
 
 ```{r}
 df_gdp <- df_gdp_percap %>%
@@ -135,8 +134,9 @@ df_gdp_comm %>%
   theme_minimal()
 ```
 
+### Child Mortality
 
-### Child Mortality 
+In this graph for Child Mortality post-communism, we can see the general downwards trend.
 
 ```{r}
 # data for the fact wrap
@@ -173,6 +173,8 @@ df_mortality %>%
 
 ### Fertility
 
+In this graph for Fertility post-communism, we can see this general downward trend.
+
 ```{r}
 # Fertility 
 df_fert <- df_fertility %>% 
@@ -206,6 +208,8 @@ df_fert_clean %>%
 
 ### CO2 Emissions
 
+Looked at the co2 Emissions between 1990-1995 to see the change pre to post communism. We can see that there is an dip in 1990 and platues for a while. Around 2005 we can see the that co2 emissions start to trend up again but within the time frame we looked at specifically for analysis of post-Communism effects.
+
 ```{r}
 # co2 emmisions
 df_co2_emm <- df_co2emissions %>%
@@ -236,8 +240,9 @@ df_co2_emm_clean %>%
   theme_minimal()
 ```
 
-
 ### Population
+
+In this graph for GDP-per-capita post communism, we can see the population remains relatively steady.
 
 ```{r}
 # Population
@@ -280,6 +285,8 @@ df_albania %>%
 
 ### Daily Income per Person
 
+In this graph for Income per person post communism, we can see this dip in the late 1990’s continued by an increase in the 2000’s
+
 ```{r}
 # Income
 df_daily <- df_daily_income %>% 
@@ -308,7 +315,9 @@ df_incomed %>%
   theme_minimal()
 ```
 
-### Life Expectancy 
+### Life Expectancy
+
+In this graph for Iife expectancy post communism, we can see this dip in the late 1990’s continued by an increase by 1995.
 
 ```{r}
 # Life expectancy 
@@ -337,9 +346,7 @@ df_lifeexp %>%
   theme_minimal()
 ```
 
-
 # Side-by-Side Analysis of Metrics in Our Chosen Timeframe (Punchline Graph)
-
 
 ```{r}
 df_gdp_tidy <- df_gdp_comm %>%
@@ -396,21 +403,15 @@ ggplot(df_combined_filtered, aes(x = year, y = value)) +
   labs(x = "Year", y = NULL, title = "Trends from 1990 - 2005")
 ```
 
-
-Our main  plot is a facet wrap of all the plots of the components that we looked at  from 1980 - 2005. We highlighted the geom_smooth for each plot so we could easily see the overall trends. For every graph we start to see trends change around 1990-1995 which lines up with major historical events that were directly related to the end of communism in the countries we looked at. 1989 is generally considered “The Fall of Communism” when the Eastern Bloc disintegrated, in 1990 Germany reunified, and in 1995 the Bosnian war ended. 
-We can see in the graph that child mortality goes down, while GDP per capita and life expectancy goes up, all which are all positive trends. However, fertility does go down, perhaps an indicator that post-communism people felt less of a need to have more children or were less focused on children. The overall population also doesn’t have any significant changes over our time frame and population growth even dips slightly. Income between 1990-1995 dips but plateaus and begins to pick up around 2000. Overall the trends we see when communism ends in these countries are positive, however fertility and population growth do decrease so not all effects were beneficial. 
-
+Our main plot is a facet wrap of all the plots of the components that we looked at from 1980 - 2005. We highlighted the geom_smooth for each plot so we could easily see the overall trends. For every graph we start to see trends change around 1990-1995 which lines up with major historical events that were directly related to the end of communism in the countries we looked at. 1989 is generally considered “The Fall of Communism” when the Eastern Bloc disintegrated, in 1990 Germany reunified, and in 1995 the Bosnian war ended. We can see in the graph that child mortality goes down, while GDP per capita and life expectancy goes up, all which are all positive trends. However, fertility does go down, perhaps an indicator that post-communism people felt less of a need to have more children or were less focused on children. The overall population also doesn’t have any significant changes over our time frame and population growth even dips slightly. Income between 1990-1995 dips but plateaus and begins to pick up around 2000. Overall the trends we see when communism ends in these countries are positive, however fertility and population growth do decrease so not all effects were beneficial.
 
 # Conclusion
 
-
-Using the above graph we were able to determine that the effect of the transition from communism to capitalism was inconclusive, as each metric experienced different changes or exhibited no change. 
-
+Using the above graph we were able to determine that the effect of the transition from communism to capitalism was inconclusive, as each metric experienced different changes or exhibited no change.
 
 # Quantification of Error
 
-To quantify our error in our calculations, we chose to use the relative standard error method to calculate the error. We chose to do this as it accounts for the sample size, as we are only analyzing countries in the Soviet and Yugoslav blocs and other Eastern European countries that transitioned from communism to capitalism. In addition, we use the relative version of standard error as it normalizes uncertainty across different metrics, making it easier to account for different scales by converting to percents. From the plots below we have relatively strong certainty for most of our metrics as the change in relative standard error doesn't fluctuate significantly. 
-
+To quantify our error in our calculations, we chose to use the relative standard error method to calculate the error. We chose to do this as it accounts for the sample size, as we are only analyzing countries in the Soviet and Yugoslav blocs and other Eastern European countries that transitioned from communism to capitalism. In addition, we use the relative version of standard error as it normalizes uncertainty across different metrics, making it easier to account for different scales by converting to percents. From the plots below we have relatively strong certainty for most of our metrics as the change in relative standard error doesn't fluctuate significantly.
 
 ```{r}
 convert_to_numeric <- function(x) {
@@ -486,12 +487,6 @@ plot_relative_se(df_population, "Population")
 plot_relative_se(df_gdp_percap, "GDP Per Capita")
 ```
 
-
 # Future Work
 
-
-If given more time, we would have liked to explore other effects that may be impacting the quality of life for the people in these countries and parallelize this with qualitative knowledge of each of these countries’ histories. We would also like to explore the technological advances of these countries after the transition to capitalism, which could be quantified by metrics such as access to the internet and electricity. Finally, we would like to examine other former communist countries such as those in South Asia to see if they exhibit the same trends as the Soviet-bloc, Yugoslav, and other Eastern European communist countries. 
-
-
-
-
+If given more time, we would have liked to explore other effects that may be impacting the quality of life for the people in these countries and parallelize this with qualitative knowledge of each of these countries’ histories. We would also like to explore the technological advances of these countries after the transition to capitalism, which could be quantified by metrics such as access to the internet and electricity. Finally, we would like to examine other former communist countries such as those in South Asia to see if they exhibit the same trends as the Soviet-bloc, Yugoslav, and other Eastern European communist countries.
