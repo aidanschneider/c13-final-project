@@ -118,7 +118,202 @@ df_gdp_comm %>%
     x = "Year",
     y = "GDP"
   )
+```
+
+```{r}
+# data for the fact wrap
+
+# Child mortality 
+df_c_mortality <- df_child_mortality %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "mortality_numbers"
+  ) %>% 
+  mutate(year = as.numeric(year)) 
+
+df_mortality <- df_c_mortality %>%
+  filter(country %in% countries) %>% 
+  filter(year <= 2025)
+
+df_mortality %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(x = year, y = mortality_numbers)) +
+  geom_line(aes(color = country))+
+  geom_smooth(method = "loess") 
+
+
+# Fertility 
+df_fert <- df_fertility %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "fertility_numbers"
+  ) %>% 
+  mutate(year = as.numeric(year)) 
+
+df_fert_clean <- df_fert %>%
+  filter(country %in% countries) %>% 
+  filter(year <= 2025)
+
+df_fert_clean %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(x = year, y = fertility_numbers)) +
+  geom_line(aes(color = country)) +
+  geom_smooth(se = TRUE, method = "loess") 
+
+
+# co2 emmisions
+df_co2_emm <- df_co2emissions %>%
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "emm",
+    values_transform = list(emm = as.numeric)  # Ensure all values are numeric
+  ) %>%
+  mutate(year = as.numeric(year))  # Convert year to numeric
+df_co2_emm_clean <- df_co2_emm %>%
+  filter(country %in% countries) %>%
+  filter(year <= 2025)
+
+df_co2_emm_clean %>%
+  ggplot(aes(x = year, y = emm))+
+  geom_line(aes(color = country))+
+  geom_smooth(method = "loess") 
+
+# Population
+df_pop <- df_population %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "population"
+  ) %>%
+  mutate(
+    population_numeric = case_when(
+      str_detect(population, "k") ~ as.numeric(str_replace(population, "k", "")) * 1e3,
+      str_detect(population, "M") ~ as.numeric(str_replace(population, "M", "")) * 1e6,
+      str_detect(population, "B") ~ as.numeric(str_replace(population, "B", "")) * 1e9,
+      TRUE ~ as.numeric(population)
+    )
+  ) %>% 
+  
+  filter(year <= 2025)
+
+df_albania <- df_pop %>% 
+  filter(country %in% countries) 
+
+df_albania %>% 
+  ggplot(aes(x = as.numeric(year), y = population_numeric, color = country)) +
+  geom_line() +
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5) + 
+  scale_y_log10()
+
+# Income
+df_daily <- df_daily_income %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "income_perp"
+  ) %>% 
+  filter(as.numeric(year) <= 2025)
+df_incomed <- df_daily %>% 
+  filter(country %in% countries)
+  
+df_incomed %>% 
+  ggplot(aes(x = as.numeric(year), y = income_perp, color = country)) +
+  geom_line() +
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5)
+
+# Life expectancy 
+df_life_exp <- df_life_expectancy %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "life_exp"
+  ) %>% 
+  filter(as.numeric(year) <= 2025)
+df_lifeexp <- df_life_exp %>% 
+  filter(country %in% countries)
+df_lifeexp %>% 
+  ggplot(aes(x = as.numeric(year), y = life_exp, color = country)) +
+  geom_line() +
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5)
+```
+
+
+
+```{r}
+df_gdp_tidy <- df_gdp_comm %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = gdp) %>%
+  mutate(metric = "GDP per capita")
+
+df_popg_tidy <- df_growth %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = population_numeric) %>%
+  mutate(metric = "Population Growth")
+
+df_childm_tidy <- df_mortality %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = mortality_numbers) %>%
+  mutate(metric = "Child Mortality")
+
+df_fertility_tidy <- df_fert_clean %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = fertility_numbers) %>%
+  mutate(metric = "Fertility")
+
+df_co2_tidy <- df_co2_emm_clean %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = emm) %>%
+  mutate(metric = "co2 Emissions")
+
+df_population_tidy <- df_albania %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = population_numeric) %>%
+  mutate(metric = "Population") 
+
+df_income_tidy <- df_incomed %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = income_perp) %>%
+  mutate(metric = "Income") 
+
+df_lifeexp_tidy <- df_lifeexp %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = life_exp) %>%
+  mutate(metric = "Life Expectance") 
+
+# Combination of plots
+df_combined <- bind_rows(df_gdp_tidy, df_popg_tidy, df_childm_tidy, df_fertility_tidy, df_co2_tidy, df_population_tidy, df_income_tidy, df_lifeexp_tidy)
+
+#Filter time range
+df_combined_filtered <- df_combined %>%
+  filter(year >= 1980, year <= 2005)
+# Plot
+ggplot(df_combined_filtered, aes(x = year, y = value)) +
+  geom_line(aes(group = country), color = "gray80", alpha = 0.3) +  
+  geom_smooth(color = "brown", se = TRUE, method = "loess") +       
+  facet_wrap(~ metric, scales = "free_y") +                       
+  labs(x = "Year", y = NULL, title = "Trends from 1990 - 2005")
+
+
 
 ```
+
 
   
