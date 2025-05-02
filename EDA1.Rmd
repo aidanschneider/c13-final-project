@@ -35,6 +35,10 @@ df_co2emissions <- read_csv("./data_files/co2_pcap_cons.csv")
 # " population csv
 df_population <- read_csv("./data_files/pop.csv")
 
+# " GDP-per-capital csv
+df_gdp_percap <- read_csv("./data_files/gdp_pcap.csv")
+```
+
 ```
 
 
@@ -51,6 +55,9 @@ Factors we want to examine for quality of life:
 
 Make EDA plots here!:
 
+```
+
+
 ```{r}
 # df_pop graphs for soviet bloc countries 
 
@@ -63,7 +70,6 @@ df_pop_g <- df_pop_growth %>%
     names_to = "year",
     values_to = "population"
   ) %>%
-  # converts values such as "400k" and "1.28M" to "400,000" and "1,280,000"
   mutate(
     population_numeric = case_when(
       str_detect(population, "k") ~ as.numeric(str_replace(population, "k", "")) * 1e3,
@@ -72,53 +78,47 @@ df_pop_g <- df_pop_growth %>%
       TRUE ~ as.numeric(population)
     )
   ) %>% 
-  # filters out all years after 2025 as they are predictions
-  filter(year <= 2025)
+  filter(as.numeric(year) <= 2025)
 
-#NOTE: TO ANALYZE A NEW COUNTRY, MAKE A NEW DATAFRAME FILTERING FOR THE COUNTRY
-#YOU ARE TRYING TO ANALYZE 
-
-# example population code 
 df_growth <- df_pop_g %>% 
   filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Czechia", "Slovakia", "Hungary")) 
 
 df_growth %>% 
   ggplot(aes(x = as.numeric(year), y = population_numeric)) +
-  geom_line(aes(color = country))+
-  geom_smooth(method = "loess") +
-  labs(title = "Population Growth of Post-Communist Countries",
-       x = "Year",
-       y =  "Population")
+  geom_line(aes(color = country)) +
+  geom_smooth(method = "loess", color = "black", se = TRUE) +
+  labs(
+    title = "Population Growth of Post-Communist Countries",
+    x = "Year",
+    y = "Population"
+  )
+
+
 ```
-
-
 ```{r}
-
-# use this dataframe for analysis 
-
-df_daily <- df_daily_income %>% 
-   pivot_longer(
+df_gdp <- df_gdp_percap %>%
+  pivot_longer(
     cols = -country,
     names_to = "year",
-    values_to = "income_perp"
-  ) %>% 
-  filter(as.numeric(year) <= 2025)
+    values_to = "gdp",
+    values_transform = list(gdp = as.numeric)  # Ensure all values are numeric
+  ) %>%
+  mutate(year = as.numeric(year))
 
-countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
-
-df_incomed <- df_daily %>% 
-  filter(country %in% countries)
-
-df_incomed
+df_gdp_comm <- df_gdp %>% 
+  filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")) %>%
+  filter (year <= 2025)
   
-df_incomed %>% 
-  ggplot(aes(x = as.numeric(year), y = income_perp, color = country)) +
-  geom_line()
+df_gdp_comm %>% 
+  ggplot(aes(x = year, y = gdp)) +
+  geom_line(aes(color = country)) +  
+  geom_smooth(method = "loess", color = "black", se = TRUE) +
+  labs(
+    title = "GDP Change Post-Communist Countries",
+    x = "Year",
+    y = "GDP"
+  )
 
 ```
 
-```{r}
-
-```
-
-
+  
