@@ -78,7 +78,7 @@ df_pop_g <- df_pop_growth %>%
       TRUE ~ as.numeric(population)
     )
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+filter(as.numeric(year) >= 1980 & as.numeric(year) <= 2025)
 
 df_growth <- df_pop_g %>% 
   filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Czechia", "Slovakia", "Hungary")) 
@@ -95,19 +95,22 @@ df_growth %>%
 
 
 ```
+
+
+
 ```{r}
 df_gdp <- df_gdp_percap %>%
   pivot_longer(
     cols = -country,
     names_to = "year",
     values_to = "gdp",
-    values_transform = list(gdp = as.numeric)  # Ensure all values are numeric
+    values_transform = list(gdp = as.numeric) 
   ) %>%
   mutate(year = as.numeric(year))
 
 df_gdp_comm <- df_gdp %>% 
   filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")) %>%
-  filter (year <= 2025)
+filter(as.numeric(year) >= 1980 & as.numeric(year) <= 2025)
   
 df_gdp_comm %>% 
   ggplot(aes(x = year, y = gdp)) +
@@ -134,14 +137,16 @@ df_c_mortality <- df_child_mortality %>%
 
 df_mortality <- df_c_mortality %>%
   filter(country %in% countries) %>% 
-  filter(year <= 2025)
+  filter(as.numeric(year) >= 1980 & as.numeric(year) <= 2025)
 
 df_mortality %>%
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(x = year, y = mortality_numbers)) +
   geom_line(aes(color = country))+
   geom_smooth(method = "loess") 
+```
 
+```{r}
 
 # Fertility 
 df_fert <- df_fertility %>% 
@@ -154,14 +159,16 @@ df_fert <- df_fertility %>%
 
 df_fert_clean <- df_fert %>%
   filter(country %in% countries) %>% 
-  filter(year <= 2025)
+  filter(as.numeric(year) >= 1980 & as.numeric(year) <= 2025)
 
 df_fert_clean %>%
   mutate(year = as.numeric(year)) %>%
   ggplot(aes(x = year, y = fertility_numbers)) +
   geom_line(aes(color = country)) +
   geom_smooth(se = TRUE, method = "loess") 
+```
 
+```{r}
 
 # co2 emmisions
 df_co2_emm <- df_co2emissions %>%
@@ -174,12 +181,15 @@ df_co2_emm <- df_co2emissions %>%
   mutate(year = as.numeric(year))  # Convert year to numeric
 df_co2_emm_clean <- df_co2_emm %>%
   filter(country %in% countries) %>%
-  filter(year <= 2025)
+  filter(as.numeric(year) >= 1980 & as.numeric(year) <= 2025)
 
 df_co2_emm_clean %>%
   ggplot(aes(x = year, y = emm))+
   geom_line(aes(color = country))+
   geom_smooth(method = "loess") 
+```
+
+```{r}
 
 # Population
 df_pop <- df_population %>% 
@@ -197,7 +207,8 @@ df_pop <- df_population %>%
     )
   ) %>% 
   
-  filter(year <= 2025)
+  filter(as.numeric(year) >= 1980 & as.numeric(year) <= 2025)
+
 
 df_albania <- df_pop %>% 
   filter(country %in% countries) 
@@ -212,6 +223,9 @@ df_albania %>%
               span = 0.3, 
               alpha = 0.5) + 
   scale_y_log10()
+```
+
+```{r}
 
 # Income
 df_daily <- df_daily_income %>% 
@@ -220,7 +234,8 @@ df_daily <- df_daily_income %>%
     names_to = "year",
     values_to = "income_perp"
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+  filter(as.numeric(year) >= 1980 & as.numeric(year) <= 2025)
+
 df_incomed <- df_daily %>% 
   filter(country %in% countries)
   
@@ -233,6 +248,10 @@ df_incomed %>%
               size = 1.2,
               span = 0.3, 
               alpha = 0.5)
+```
+
+
+```{r}
 
 # Life expectancy 
 df_life_exp <- df_life_expectancy %>% 
@@ -241,7 +260,8 @@ df_life_exp <- df_life_expectancy %>%
     names_to = "year",
     values_to = "life_exp"
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+  filter(as.numeric(year) >= 1980 & as.numeric(year) <= 2025)
+
 df_lifeexp <- df_life_exp %>% 
   filter(country %in% countries)
 df_lifeexp %>% 
