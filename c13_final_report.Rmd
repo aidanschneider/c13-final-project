@@ -15,9 +15,9 @@ library(dplyr)
 
 # Background and Data
 
-# Analysis
+# EDA and Analysis of Data 
 
-#Import data files
+### Import data files
 
 ```{r}
 # import child mortality csv
@@ -45,9 +45,9 @@ df_population <- read_csv("./data_files/pop.csv")
 df_gdp_percap <- read_csv("./data_files/gdp_pcap.csv")
 ```
 
-#The Metrics We Are Using
+## Metrics
 
-The metrics we want to examine for quality of life:
+
 
 -   child mortality
 -   daily income
@@ -58,14 +58,15 @@ The metrics we want to examine for quality of life:
 -   c02 emissions
 -   population
 
-Make EDA plots here!:
+
+## EDA
+
+To begin our analysis of the data, we first perform EDA to get a general idea for the shape of the overall data. We decided to look at the full timescale for each of these datasets to determine key inflection points that could be attributed to the transition from communism to capitalism that we are interested in. Our full EDA analysis can be found in 
+
+### Population Growth
 
 ```{r}
-# df_pop graphs for soviet bloc countries 
 
-
-# if you need to filter for only post-communist countries, use the list below:
-# ("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
 df_pop_g <- df_pop_growth %>% 
   pivot_longer(
     cols = -country,
@@ -98,6 +99,11 @@ df_growth %>%
 
 ```
 
+In this plot, our data had a lot of gaps and began in 1960. Despit this we were able to determine a key inflection point around 1980-2005 where population growth stagnates. 
+
+
+### GDP-Per-Capita
+
 ```{r}
 df_gdp <- df_gdp_percap %>%
   pivot_longer(
@@ -122,6 +128,9 @@ df_gdp_comm %>%
     y = "GDP"
   )
 ```
+
+
+### Child Mortality 
 
 ```{r}
 # data for the fact wrap
@@ -151,6 +160,8 @@ df_mortality %>%
               alpha = 0.5) 
 ```
 
+### Fertility
+
 ```{r}
 # Fertility 
 df_fert <- df_fertility %>% 
@@ -176,6 +187,8 @@ df_fert_clean %>%
               span = 0.3, 
               alpha = 0.5) 
 ```
+
+### CO2 Emissions
 
 ```{r}
 # co2 emmisions
@@ -259,6 +272,8 @@ df_incomed %>%
               alpha = 0.5)
 ```
 
+### Life Expectancy 
+
 ```{r}
 # Life expectancy 
 df_life_exp <- df_life_expectancy %>% 
@@ -336,8 +351,85 @@ ggplot(df_combined_filtered, aes(x = year, y = value)) +
   labs(x = "Year", y = NULL, title = "Trends from 1990 - 2005")
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
+# Quantification of Error
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+convert_to_numeric <- function(x) {
+  if (is.numeric(x)) return(x)
+  
+  # convert "k" to thousands, "M" to millions and so on
+  case_when(
+    str_detect(x, "k$") ~ as.numeric(str_replace(x, "k$", "")) * 1e3,
+    str_detect(x, "M$") ~ as.numeric(str_replace(x, "M$", "")) * 1e6,
+    str_detect(x, "B$") ~ as.numeric(str_replace(x, "B$", "")) * 1e9,
+    TRUE ~ suppressWarnings(as.numeric(x))
+  )
+}
+
+
+plot_relative_se <- function(df, title_prefix) {
+  # converting all column names to character
+  df <- df %>% mutate(across(everything(), as.character))
+  
+  # Pivot and calculate RSE
+  df_long <- df %>%
+    pivot_longer(
+      cols = -country,
+      names_to = "year",
+      values_to = "value"
+    ) %>%
+    filter(country %in% countries) %>%
+    filter(as.numeric(year) <= 2005 & as.numeric(year) >= 1980) %>% 
+  
+    mutate(value_numeric = sapply(value, convert_to_numeric)) %>%
+
+    group_by(year) %>%
+    summarize(
+      mean_value = mean(value_numeric, na.rm = TRUE),
+      std_dev = sd(value_numeric, na.rm = TRUE),
+      n_countries = sum(!is.na(value_numeric)),
+      standard_error = std_dev / sqrt(n_countries),
+      relative_se = if_else(
+        abs(mean_value) > 0.0000001, # Avoid division by zero or very small numbers
+        (standard_error / abs(mean_value)) * 100,
+        NA_real_
+      )
+    )
+  
+  ggplot(df_long, aes(x = as.numeric(year), y = relative_se)) +
+    geom_line() +
+    geom_point(alpha = 0.5) +
+    labs(
+      title = paste(title_prefix, "Relative Standard Error Over Time"),
+      subtitle = "Standard error as percentage of mean value",
+      x = "Year",
+      y = "Relative Standard Error (%)"
+    ) +
+    theme_minimal()
+}
+
+
+countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", 
+               "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", 
+               "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", 
+               "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", 
+               "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", 
+               "Slovakia", "Hungary")
+
+
+plot_relative_se(df_child_mortality, "Child Mortality")
+plot_relative_se(df_daily_income, "Daily Income")
+plot_relative_se(df_life_expectancy, "Life Expectancy")
+plot_relative_se(df_pop_growth, "Population Growth")
+plot_relative_se(df_fertility, "Fertility Rate")
+plot_relative_se(df_co2emissions, "CO2 Emissions")
+plot_relative_se(df_population, "Population")
+plot_relative_se(df_gdp_percap, "GDP Per Capita")
+```
+
+
+
+
+
+

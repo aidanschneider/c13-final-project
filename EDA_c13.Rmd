@@ -107,8 +107,7 @@ df_daily <- df_daily_income %>%
     cols = -country,
     names_to = "year",
     values_to = "income_perp"
-  ) %>% 
-  filter(as.numeric(year) <= 2000 & as.numeric(year) >= 1985)
+  )
 
 countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
 
@@ -158,18 +157,223 @@ df_lifeexp %>%
 
 
 ```{r}
-population_se <- df_pop %>%
-  filter(country %in% countries) %>%
+# Calculate standard error by year for your population data
+sem_by_year <- df_pop %>%
+  filter(country %in% countries) %>%  # Filter for your selected countries
   group_by(year) %>%
   summarize(
     mean_population = mean(population_numeric, na.rm = TRUE),
     std_dev = sd(population_numeric, na.rm = TRUE),
-    n_countries = n(),
-    standard_error = std_dev / sqrt(n_countries)
+    n_countries = sum(!is.na(population_numeric)),
+    standard_error = std_dev / sqrt(n_countries),
+    # Also calculate relative standard error as percentage of mean
+    relative_se = (standard_error / mean_population) * 100
   )
 
-# View the results
-population_se
+
+# Plot 2: Relative Standard Error over time (often more interpretable)
+ggplot(sem_by_year, aes(x = as.numeric(year), y = relative_se)) +
+  geom_line() +
+  geom_point(alpha = 0.5) +
+  labs(title = "Relative Standard Error of Mean Population Over Time",
+       subtitle = "Standard error as percentage of mean population",
+       x = "Year",
+       y = "Relative Standard Error (%)") +
+  theme_minimal()
+
+```
+
+```{r}
+income_sem_by_year <- df_daily %>%
+  filter(country %in% countries) %>%  # Filter for your selected countries
+  group_by(year) %>%
+  summarize(
+    mean_income = mean(as.numeric(income_perp), na.rm = TRUE),
+    std_dev = sd(as.numeric(income_perp), na.rm = TRUE),
+    n_countries = sum(!is.na(income_perp)),
+    standard_error = std_dev / sqrt(n_countries),
+    # Calculate relative standard error (as percentage of mean)
+    relative_se = (standard_error / mean_income) * 100
+  )
+
+
+# Plot 2: Relative Standard Error over time
+ggplot(income_sem_by_year, aes(x = as.numeric(year), y = relative_se)) +
+  geom_line() +
+  geom_point(alpha = 0.5) +
+  labs(title = "Relative Standard Error of Mean Daily Income Over Time",
+       subtitle = "Standard error as percentage of mean income",
+       x = "Year",
+       y = "Relative Standard Error (%)") +
+  theme_minimal()
+```
+```{r}
+# Calculate standard error by year for life expectancy
+life_exp_sem_by_year <- df_life_exp %>%
+  filter(country %in% countries) %>%  # Filter for your selected countries
+  group_by(year) %>%
+  summarize(
+    mean_life_exp = mean(as.numeric(life_exp), na.rm = TRUE),
+    std_dev = sd(as.numeric(life_exp), na.rm = TRUE),
+    n_countries = sum(!is.na(life_exp)),
+    standard_error = std_dev / sqrt(n_countries),
+    # Calculate relative standard error
+    relative_se = (standard_error / mean_life_exp) * 100
+  )
+
+
+# Plot 2: Relative Standard Error over time
+ggplot(life_exp_sem_by_year, aes(x = as.numeric(year), y = relative_se)) +
+  geom_line() +
+  geom_point(alpha = 0.5) +
+  labs(title = "Relative Standard Error of Mean Life Expectancy Over Time",
+       subtitle = "Standard error as percentage of mean life expectancy",
+       x = "Year",
+       y = "Relative Standard Error (%)") +
+  theme_minimal()
+```
+
+```{r}
+
+# Define countries list for filtering
+countries <- c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", 
+               "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", 
+               "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", 
+               "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", 
+               "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", 
+               "Slovakia", "Hungary")
+
+# 1. CHILD MORTALITY RELATIVE STANDARD ERROR
+mortality_sem_by_year <- df_child_mortality %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "mortality"
+  ) %>%
+  filter(country %in% countries) %>%
+  group_by(year) %>%
+  summarize(
+    mean_mortality = mean(as.numeric(mortality), na.rm = TRUE),
+    std_dev = sd(as.numeric(mortality), na.rm = TRUE),
+    n_countries = sum(!is.na(mortality)),
+    standard_error = std_dev / sqrt(n_countries),
+    relative_se = (standard_error / mean_mortality) * 100
+  )
+
+ggplot(mortality_sem_by_year, aes(x = as.numeric(year), y = relative_se)) +
+  geom_line() +
+  geom_point(alpha = 0.5) +
+  labs(title = "Relative Standard Error of Child Mortality Over Time",
+       subtitle = "Standard error as percentage of mean child mortality",
+       x = "Year",
+       y = "Relative Standard Error (%)") +
+  theme_minimal()
+
+# 2. POPULATION GROWTH RELATIVE STANDARD ERROR
+pop_growth_sem_by_year <- df_pop_growth %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "growth_rate"
+  ) %>%
+  filter(country %in% countries) %>%
+  group_by(year) %>%
+  summarize(
+    mean_growth = mean(as.numeric(growth_rate), na.rm = TRUE),
+    std_dev = sd(as.numeric(growth_rate), na.rm = TRUE),
+    n_countries = sum(!is.na(growth_rate)),
+    standard_error = std_dev / sqrt(n_countries),
+    relative_se = (standard_error / abs(mean_growth)) * 100
+  )
+
+ggplot(pop_growth_sem_by_year, aes(x = as.numeric(year), y = relative_se)) +
+  geom_line() +
+  geom_point(alpha = 0.5) +
+  labs(title = "Relative Standard Error of Population Growth Rate Over Time",
+       subtitle = "Standard error as percentage of mean growth rate",
+       x = "Year",
+       y = "Relative Standard Error (%)") +
+  theme_minimal()
+
+# 3. FERTILITY RELATIVE STANDARD ERROR
+fertility_sem_by_year <- df_fertility %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "fertility"
+  ) %>%
+  filter(country %in% countries) %>%
+  group_by(year) %>%
+  summarize(
+    mean_fertility = mean(as.numeric(fertility), na.rm = TRUE),
+    std_dev = sd(as.numeric(fertility), na.rm = TRUE),
+    n_countries = sum(!is.na(fertility)),
+    standard_error = std_dev / sqrt(n_countries),
+    relative_se = (standard_error / mean_fertility) * 100
+  )
+
+ggplot(fertility_sem_by_year, aes(x = as.numeric(year), y = relative_se)) +
+  geom_line() +
+  geom_point(alpha = 0.5) +
+  labs(title = "Relative Standard Error of Fertility Rate Over Time",
+       subtitle = "Standard error as percentage of mean fertility rate",
+       x = "Year",
+       y = "Relative Standard Error (%)") +
+  theme_minimal()
+
+# 4. CO2 EMISSIONS RELATIVE STANDARD ERROR
+co2_sem_by_year <- df_co2emissions %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "co2_emissions"
+  ) %>%
+  filter(country %in% countries) %>%
+  group_by(year) %>%
+  summarize(
+    mean_emissions = mean(as.numeric(co2_emissions), na.rm = TRUE),
+    std_dev = sd(as.numeric(co2_emissions), na.rm = TRUE),
+    n_countries = sum(!is.na(co2_emissions)),
+    standard_error = std_dev / sqrt(n_countries),
+    relative_se = (standard_error / mean_emissions) * 100
+  )
+
+ggplot(co2_sem_by_year, aes(x = as.numeric(year), y = relative_se)) +
+  geom_line() +
+  geom_point(alpha = 0.5) +
+  labs(title = "Relative Standard Error of CO2 Emissions Over Time",
+       subtitle = "Standard error as percentage of mean CO2 emissions per capita",
+       x = "Year",
+       y = "Relative Standard Error (%)") +
+  theme_minimal()
+
+# 5. GDP PER CAPITA RELATIVE STANDARD ERROR
+gdp_sem_by_year <- df_gdp_percap %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "gdp_percap"
+  ) %>%
+  filter(country %in% countries) %>%
+  group_by(year) %>%
+  summarize(
+    mean_gdp = mean(as.numeric(gdp_percap), na.rm = TRUE),
+    std_dev = sd(as.numeric(gdp_percap), na.rm = TRUE),
+    n_countries = sum(!is.na(gdp_percap)),
+    standard_error = std_dev / sqrt(n_countries),
+    relative_se = (standard_error / mean_gdp) * 100
+  )
+
+ggplot(gdp_sem_by_year, aes(x = as.numeric(year), y = relative_se)) +
+  geom_line() +
+  geom_point(alpha = 0.5) +
+  labs(title = "Relative Standard Error of GDP Per Capita Over Time",
+       subtitle = "Standard error as percentage of mean GDP per capita",
+       x = "Year",
+       y = "Relative Standard Error (%)") +
+  theme_minimal()
+
+
 
 ```
 
