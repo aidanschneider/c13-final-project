@@ -220,7 +220,7 @@ df_daily <- df_daily_income %>%
     names_to = "year",
     values_to = "income_perp"
   ) %>% 
-  filter(as.numeric(year) <= 2000 & as.numeric(year) >= 1985)
+  filter(as.numeric(year) <= 2025)
 df_incomed <- df_daily %>% 
   filter(country %in% countries)
   
