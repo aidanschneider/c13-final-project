@@ -86,7 +86,7 @@ df_pop_g <- df_pop_growth %>%
       TRUE ~ as.numeric(population)
     )
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) > 1980)
 
 df_growth <- df_pop_g %>% 
   filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Czechia", "Slovakia", "Hungary")) 
@@ -121,7 +121,7 @@ df_gdp <- df_gdp_percap %>%
 
 df_gdp_comm <- df_gdp %>% 
   filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")) %>%
-  filter (year <= 2025)
+  filter (as.numeric(year) <= 2005 & as.numeric(year) > 1980)
   
 df_gdp_comm %>% 
   ggplot(aes(x = year, y = gdp)) +
@@ -152,7 +152,7 @@ df_c_mortality <- df_child_mortality %>%
 
 df_mortality <- df_c_mortality %>%
   filter(country %in% countries) %>% 
-  filter(year <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) > 1980)
 
 df_mortality %>%
   mutate(year = as.numeric(year)) %>%
@@ -185,7 +185,7 @@ df_fert <- df_fertility %>%
 
 df_fert_clean <- df_fert %>%
   filter(country %in% countries) %>% 
-  filter(year <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) > 1980)
 
 df_fert_clean %>%
   mutate(year = as.numeric(year)) %>%
@@ -218,7 +218,7 @@ df_co2_emm <- df_co2emissions %>%
   mutate(year = as.numeric(year))  # Convert year to numeric
 df_co2_emm_clean <- df_co2_emm %>%
   filter(country %in% countries) %>%
-  filter(year <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) > 1980)
 
 df_co2_emm_clean %>%
   ggplot(aes(x = year, y = emm))+
@@ -256,7 +256,7 @@ df_pop <- df_population %>%
     )
   ) %>% 
   
-  filter(year <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) > 1980)
 
 df_albania <- df_pop %>% 
   filter(country %in% countries) 
@@ -288,7 +288,7 @@ df_daily <- df_daily_income %>%
     names_to = "year",
     values_to = "income_perp"
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) > 1980)
 df_incomed <- df_daily %>% 
   filter(country %in% countries)
   
@@ -318,7 +318,7 @@ df_life_exp <- df_life_expectancy %>%
     names_to = "year",
     values_to = "life_exp"
   ) %>% 
-  filter(as.numeric(year) <= 2025)
+  filter(as.numeric(year) <= 2005 & as.numeric(year) > 1980)
 df_lifeexp <- df_life_exp %>% 
   filter(country %in% countries)
 df_lifeexp %>% 
@@ -409,7 +409,7 @@ Using the above graph we were able to determine that the effect of the transitio
 
 # Quantification of Error
 
-To quantify our error in our calculations, we chose to use the relative standard error method to calculate the error. We chose to do this as it accounts for the sample size, as we are only analyzing countries in the Soviet and Yugoslav blocs and other Eastern European countries that transitioned from communism to capitalism. In addition, we use the relative version of standard error as it normalizes uncertainty across different metrics, making it easier to account for different scales by converting to percents. 
+To quantify our error in our calculations, we chose to use the relative standard error method to calculate the error. We chose to do this as it accounts for the sample size, as we are only analyzing countries in the Soviet and Yugoslav blocs and other Eastern European countries that transitioned from communism to capitalism. In addition, we use the relative version of standard error as it normalizes uncertainty across different metrics, making it easier to account for different scales by converting to percents. From the plots below we have relatively strong certainty for most of our metrics as the change in relative standard error doesn't fluctuate significantly. 
 
 
 ```{r}
