@@ -6,28 +6,338 @@ output:
     toc: true
 ---
 
-```{r}
+```{r setup}
 library(tidyverse)
 library(dplyr)
 ```
-# Intro 
 
-
-
- 
+# Intro
 
 # Background and Data
 
-
 # Analysis
 
-```{r}
+#Import data files
 
+```{r}
+# import child mortality csv
+df_child_mortality <- read_csv("./data_files/child_mortality_0_5_year_olds_dying_per_1000_born.csv")
+
+# " daily income csv
+df_daily_income <- read_csv("./data_files/mincpcap_cppp.csv")
+
+# " life expectancy at birth csv
+df_life_expectancy <- read_csv("./data_files/life_exp.csv")
+
+# " population growth csv
+df_pop_growth <- read_csv("./data_files/population_growth_annual_percent.csv")
+
+# " fertility csv
+df_fertility <- read_csv("./data_files/children_per_woman_total_fertility.csv")
+
+# " c02 emissions csv
+df_co2emissions <- read_csv("./data_files/co2_pcap_cons.csv")
+
+# " population csv
+df_population <- read_csv("./data_files/pop.csv")
+
+# " GDP-per-capital csv
+df_gdp_percap <- read_csv("./data_files/gdp_pcap.csv")
+```
+
+#The Metrics We Are Using
+
+The metrics we want to examine for quality of life:
+
+-   child mortality
+-   daily income
+-   GDP-per-capita
+-   life expectancy at birth
+-   population growth
+-   fertility
+-   c02 emissions
+-   population
+
+Make EDA plots here!:
+
+```{r}
+# df_pop graphs for soviet bloc countries 
+
+
+# if you need to filter for only post-communist countries, use the list below:
+# ("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")
+df_pop_g <- df_pop_growth %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "population"
+  ) %>%
+  mutate(
+    population_numeric = case_when(
+      str_detect(population, "k") ~ as.numeric(str_replace(population, "k", "")) * 1e3,
+      str_detect(population, "M") ~ as.numeric(str_replace(population, "M", "")) * 1e6,
+      str_detect(population, "B") ~ as.numeric(str_replace(population, "B", "")) * 1e9,
+      TRUE ~ as.numeric(population)
+    )
+  ) %>% 
+  filter(as.numeric(year) <= 2025)
+
+df_growth <- df_pop_g %>% 
+  filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Czechia", "Slovakia", "Hungary")) 
+
+df_growth %>% 
+  ggplot(aes(x = as.numeric(year), y = population_numeric)) +
+  geom_line(aes(color = country)) +
+  geom_smooth(method = "loess", color = "black", se = TRUE) +
+  labs(
+    title = "Population Growth of Post-Communist Countries",
+    x = "Year",
+    y = "Population"
+  )
+
+
+```
+
+```{r}
+df_gdp <- df_gdp_percap %>%
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "gdp",
+    values_transform = list(gdp = as.numeric)  # Ensure all values are numeric
+  ) %>%
+  mutate(year = as.numeric(year))
+
+df_gdp_comm <- df_gdp %>% 
+  filter(country %in% c("Armenia", "Azerbaijan", "Belarus", "Estonia", "Georgia", "Kazakhstan", "Kyrgyzstan", "Latvia", "Lithuania", "Moldova", "Russia", "Tajikistan", "Turkmenistan", "Ukraine", "Uzbekistan", "Serbia", "Croatia", "Bosnia and Herzegovina", "Slovenia", "Montenegro", "North Macedonia", "Albania", "Bulgaria", "Romania", "Poland", "Germany", "Czechia", "Slovakia", "Hungary")) %>%
+  filter (year <= 2025)
+  
+df_gdp_comm %>% 
+  ggplot(aes(x = year, y = gdp)) +
+  geom_line(aes(color = country)) +  
+  geom_smooth(method = "loess", color = "black", se = TRUE) +
+  labs(
+    title = "GDP Change Post-Communist Countries",
+    x = "Year",
+    y = "GDP"
+  )
+```
+
+```{r}
+# data for the fact wrap
+
+# Child mortality 
+df_c_mortality <- df_child_mortality %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "mortality_numbers"
+  ) %>% 
+  mutate(year = as.numeric(year)) 
+
+df_mortality <- df_c_mortality %>%
+  filter(country %in% countries) %>% 
+  filter(year <= 2025)
+
+df_mortality %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(x = year, y = mortality_numbers)) +
+  geom_line(aes(color = country))+
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5) 
+```
+
+```{r}
+# Fertility 
+df_fert <- df_fertility %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "fertility_numbers"
+  ) %>% 
+  mutate(year = as.numeric(year)) 
+
+df_fert_clean <- df_fert %>%
+  filter(country %in% countries) %>% 
+  filter(year <= 2025)
+
+df_fert_clean %>%
+  mutate(year = as.numeric(year)) %>%
+  ggplot(aes(x = year, y = fertility_numbers)) +
+  geom_line(aes(color = country)) +
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5) 
+```
+
+```{r}
+# co2 emmisions
+df_co2_emm <- df_co2emissions %>%
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "emm",
+    values_transform = list(emm = as.numeric)  # Ensure all values are numeric
+  ) %>%
+  mutate(year = as.numeric(year))  # Convert year to numeric
+df_co2_emm_clean <- df_co2_emm %>%
+  filter(country %in% countries) %>%
+  filter(year <= 2025)
+
+df_co2_emm_clean %>%
+  ggplot(aes(x = year, y = emm))+
+  geom_line(aes(color = country))+
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5)
+```
+
+```{r}
+# Population
+df_pop <- df_population %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "population"
+  ) %>%
+  mutate(
+    population_numeric = case_when(
+      str_detect(population, "k") ~ as.numeric(str_replace(population, "k", "")) * 1e3,
+      str_detect(population, "M") ~ as.numeric(str_replace(population, "M", "")) * 1e6,
+      str_detect(population, "B") ~ as.numeric(str_replace(population, "B", "")) * 1e9,
+      TRUE ~ as.numeric(population)
+    )
+  ) %>% 
+  
+  filter(year <= 2025)
+
+df_albania <- df_pop %>% 
+  filter(country %in% countries) 
+
+df_albania %>% 
+  ggplot(aes(x = as.numeric(year), y = population_numeric, color = country)) +
+  geom_line() +
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5) + 
+  scale_y_log10()
+```
+
+```{r}
+# Income
+df_daily <- df_daily_income %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "income_perp"
+  ) %>% 
+  filter(as.numeric(year) <= 2025)
+df_incomed <- df_daily %>% 
+  filter(country %in% countries)
+  
+df_incomed %>% 
+  ggplot(aes(x = as.numeric(year), y = income_perp, color = country)) +
+  geom_line() +
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5)
+```
+
+```{r}
+# Life expectancy 
+df_life_exp <- df_life_expectancy %>% 
+   pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "life_exp"
+  ) %>% 
+  filter(as.numeric(year) <= 2025)
+df_lifeexp <- df_life_exp %>% 
+  filter(country %in% countries)
+df_lifeexp %>% 
+  ggplot(aes(x = as.numeric(year), y = life_exp, color = country)) +
+  geom_line() +
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5)
+```
+
+```{r}
+df_gdp_tidy <- df_gdp_comm %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = gdp) %>%
+  mutate(metric = "GDP per capita")
+
+df_popg_tidy <- df_growth %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = population_numeric) %>%
+  mutate(metric = "Population Growth")
+
+df_childm_tidy <- df_mortality %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = mortality_numbers) %>%
+  mutate(metric = "Child Mortality")
+
+df_fertility_tidy <- df_fert_clean %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = fertility_numbers) %>%
+  mutate(metric = "Fertility")
+
+df_co2_tidy <- df_co2_emm_clean %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = emm) %>%
+  mutate(metric = "co2 Emissions")
+
+df_population_tidy <- df_albania %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = population_numeric) %>%
+  mutate(metric = "Population") 
+
+df_income_tidy <- df_incomed %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = income_perp) %>%
+  mutate(metric = "Income") 
+
+df_lifeexp_tidy <- df_lifeexp %>%
+  mutate(year = as.numeric(year)) %>%
+  select(country, year, value = life_exp) %>%
+  mutate(metric = "Life Expectance") 
+
+# Combination of plots
+df_combined <- bind_rows(df_gdp_tidy, df_popg_tidy, df_childm_tidy, df_fertility_tidy, df_co2_tidy, df_population_tidy, df_income_tidy, df_lifeexp_tidy)
+
+#Filter time range
+df_combined_filtered <- df_combined %>%
+  filter(year >= 1980, year <= 2005)
+# Plot
+ggplot(df_combined_filtered, aes(x = year, y = value)) +
+  geom_line(aes(group = country), color = "gray80", alpha = 0.3) +  
+  geom_smooth(color = "brown", se = TRUE, method = "loess") +       
+  facet_wrap(~ metric, scales = "free_y") +                       
+  labs(x = "Year", y = NULL, title = "Trends from 1990 - 2005")
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
 
 The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
-
