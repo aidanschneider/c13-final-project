@@ -111,7 +111,8 @@ df_incomed <- df_daily %>%
   
 df_incomed %>% 
   ggplot(aes(x = as.numeric(year), y = income_perp, color = country)) +
-  geom_line()
+  geom_line() +
+  geom_smooth()
 
 ```
 
@@ -136,7 +137,12 @@ df_lifeexp
 df_lifeexp %>% 
   ggplot(aes(x = as.numeric(year), y = life_exp, color = country)) +
   geom_line() +
-  geom_smooth(span = 0.3)
+  geom_smooth(aes(group = 1, color = NULL), 
+              method = "loess",
+              color = "black", 
+              size = 1.2,
+              span = 0.3, 
+              alpha = 0.5)
 ```
 
 
